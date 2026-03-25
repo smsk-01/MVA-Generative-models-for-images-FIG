@@ -1,4 +1,4 @@
-# A Toy-2D Study of DPS and FIG for Linear Inverse Problems
+# A 2D Study of Diffusion Posterior Sampling (DPS) and FLOW WITH INTERPOLANT GUIDANCE FIG for Linear Inverse Problems
 
 This folder contains the paper-style deliverable for a toy-2D extension of the original FIG repository.
 
@@ -8,9 +8,11 @@ The goal of this project is to study conditional diffusion samplers for linear i
 - `FIG` (Flow with Interpolant Guidance)
 - `FIG+` (FIG with a Tweedie-based mixing step for mask-like operators)
 
-The full paper is available here:
+The FIG paper is available here: https://openreview.net/pdf?id=fs2Z2z3GRx
 
-- [`FIG_DPS_Toy2D_Paper.tex`](./FIG_DPS_Toy2D_Paper.tex)
+Our full report is available here:
+
+- [`FIG_DPS_Toy2D_Paper.tex`](./toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex)
 
 ## What Is In This Study
 
@@ -40,52 +42,43 @@ This means that the first coordinate is observed and the second one is hidden. I
 
 In the compact benchmark reported in the paper, `FIG+` achieves the best posterior-quality metrics on both `Two-Moons` and `Eight-Gaussians`.
 
-## Qualitative Comparison
-
-### Two-Moons
-
-![Two-Moons qualitative comparison](./report_assets/qualitative/two_moons_sigma_0.50_dps_vs_fig_plus.png)
-
-### Eight-Gaussians
-
-![Eight-Gaussians qualitative comparison](./report_assets/qualitative/eight_gaussians_sigma_0.50_dps_vs_fig_plus.png)
-
-## Quantitative Trends
-
-### Two-Moons
-
-![Two-Moons metric trends](./report_assets/two_moons_paper_metric_trends.png)
-
-### Eight-Gaussians
-
-![Eight-Gaussians metric trends](./report_assets/eight_gaussians_paper_metric_trends.png)
-
 ## Denoising Dynamics
 
 The denoising animations are one of the most informative outputs of the project. They show how the conditional sample cloud evolves from the same noisy initialization under different samplers.
 
 ### DPS vs FIG+
 
-![DPS vs FIG+ GIF](./animations/two_moons_sigma_0.05_dps_vs_fig_plus.gif)
+![DPS vs FIG+ GIF](./assets/readme/two_moons_sigma_0.05_dps_vs_fig_plus.gif)
 
 ### DPS vs FIG vs FIG+
 
-![DPS vs FIG vs FIG+ GIF](./animations/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus.gif)
+![DPS vs FIG vs FIG+ GIF](./assets/readme/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus.gif)
 
 The corresponding frame strips are also available:
 
-- [`two_moons_sigma_0.05_dps_vs_fig_plus_strip.png`](./animations/two_moons_sigma_0.05_dps_vs_fig_plus_strip.png)
-- [`two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png`](./animations/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png)
+- [`two_moons_sigma_0.05_dps_vs_fig_plus_strip.png`](./assets/readme/two_moons_sigma_0.05_dps_vs_fig_plus_strip.png)
+- [`two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png`](./assets/readme/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png)
+
+## Quantitative Trends
+
+### Two-Moons
+
+![Two-Moons metric trends](./assets/readme/two_moons_paper_metric_trends.png)
+
+### Eight-Gaussians
+
+![Eight-Gaussians metric trends](./assets/readme/eight_gaussians_paper_metric_trends.png)
+
 
 ## File Structure
 
-- [`FIG_DPS_Toy2D_Paper.tex`](./FIG_DPS_Toy2D_Paper.tex): paper-style LaTeX report
-- [`build_paper.sh`](./build_paper.sh): build script for the LaTeX paper
-- [`report_assets/`](./report_assets): figures used in the paper
-- [`report_assets/qualitative/`](./report_assets/qualitative): qualitative DPS vs FIG+ comparison plots
-- [`animations/`](./animations): denoising GIFs and representative frame strips
-- [`corrected_best_summary.csv`](./corrected_best_summary.csv): compact summary of the best configurations
-- [`corrected_best_summary.md`](./corrected_best_summary.md): markdown version of the summary table
+- [`toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex`](./toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex): paper-style LaTeX report
+- [`toy_2d_outputs/paper_style/build_paper.sh`](./toy_2d_outputs/paper_style/build_paper.sh): build script for the LaTeX paper
+- [`toy_2d_outputs/paper_style/report_assets/`](./toy_2d_outputs/paper_style/report_assets): figures used in the paper
+- [`toy_2d_outputs/paper_style/report_assets/qualitative/`](./toy_2d_outputs/paper_style/report_assets/qualitative): qualitative DPS vs FIG+ comparison plots
+- [`toy_2d_outputs/paper_style/animations/`](./toy_2d_outputs/paper_style/animations): denoising GIFs and representative frame strips
+- [`toy_2d_outputs/paper_style/corrected_best_summary.csv`](./toy_2d_outputs/paper_style/corrected_best_summary.csv): compact summary of the best configurations
+- [`toy_2d_outputs/paper_style/corrected_best_summary.md`](./toy_2d_outputs/paper_style/corrected_best_summary.md): markdown version of the summary table
 
 ## Build
 
