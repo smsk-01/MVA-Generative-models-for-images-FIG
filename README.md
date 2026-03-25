@@ -1,85 +1,103 @@
-<div align="center">
+# A Toy-2D Study of DPS and FIG for Linear Inverse Problems
 
-# FIG: Flow with Interpolant Guidance for Linear Inverse Problems
+This folder contains the paper-style deliverable for a toy-2D extension of the original FIG repository.
 
-[[OpenReview]](https://openreview.net/forum?id=fs2Z2z3GRx)
-[[Project]](https://riccizz.github.io/FIG/)
+The goal of this project is to study conditional diffusion samplers for linear inverse problems in a setting where the posterior geometry is fully visible. Instead of working directly in high-dimensional image space, we train compact DDPM priors on two synthetic 2D datasets and compare three conditional solvers:
 
-</div>
+- `DPS` (Diffusion Posterior Sampling)
+- `FIG` (Flow with Interpolant Guidance)
+- `FIG+` (FIG with a Tweedie-based mixing step for mask-like operators)
 
-## Description
+The full paper is available here:
 
-Diffusion and flow matching models have been recently used to solve various linear inverse problems such as image restoration. Using a pre-trained diffusion or flow-matching model as a prior, most existing methods modify the reverse-time sampling process by incorporating the likelihood information from the measurement. However, they struggle in challenging scenarios, e.g., in case of high measurement noise or severe ill-posedness. In this paper, we propose Flow with Interpolant Guidance (FIG), an algorithm where the reverse-time sampling is efficiently guided with measurement interpolants through theoretically justified schemes. Experimentally, we demonstrate that FIG efficiently produce highly competitive results on a variety of linear image reconstruction tasks on natural image datasets. We improve upon state-of-the-art baseline algorithms, especially for challenging tasks. Code will be released.
+- [`FIG_DPS_Toy2D_Paper.tex`](./FIG_DPS_Toy2D_Paper.tex)
 
-<!-- <table align="center">
-  <tr>
-    <td align="center"><img src="assets/true_traj.gif" width="250"/></td>
-    <td align="center"><img src="assets/rf_traj.gif" width="250"/></td>
-    <td align="center"><img src="assets/hrf_traj.gif" width="250"/></td>
-  </tr>
-  <tr>
-    <td align="center">Linear Interpolation</td>
-    <td align="center">Rectified Flow</td>
-    <td align="center">Hierarchical Rectified Flow (ours)</td>
-  </tr>
-</table> -->
+## What Is In This Study
 
+We extend the original FIG codebase with a dedicated toy-2D pipeline:
 
-## How to run
+- synthetic datasets: `Two-Moons` and `Eight-Gaussians`
+- a DDPM prior trained from scratch with an MLP denoiser and sinusoidal time embedding
+- a 1D noisy linear observation model
+- modular implementations of `DPS`, `FIG`, and `FIG+`
+- a reference posterior sampler built by importance reweighting
+- quantitative evaluation with posterior mean MSE, sliced Wasserstein distance, and measurement MSE
+- qualitative plots and denoising GIFs
+
+The observation model is
+
+$$
+y = A x^\star + n, \qquad A = [1 \;\; 0], \qquad n \sim \mathcal{N}(0, \sigma_n^2)$$
+
+This means that the first coordinate is observed and the second one is hidden. In this setting, the posterior remains non-Gaussian because the prior itself is non-Gaussian.
+
+## Main Takeaways
+
+- The toy-2D setting is extremely useful for interpreting inverse-problem samplers because the prior support, the observation line, and the conditional samples can all be visualized directly.
+- `DPS` is a strong baseline and already recovers the posterior geometry reasonably well.
+- Plain `FIG` is more sensitive to the operator structure and is weaker than the other methods on this mask-like task.
+- `FIG+` is the strongest method overall in the reported experiments: it best preserves the hidden-coordinate structure while still enforcing the measurement.
+
+In the compact benchmark reported in the paper, `FIG+` achieves the best posterior-quality metrics on both `Two-Moons` and `Eight-Gaussians`.
+
+## Qualitative Comparison
+
+### Two-Moons
+
+![Two-Moons qualitative comparison](./report_assets/qualitative/two_moons_sigma_0.50_dps_vs_fig_plus.png)
+
+### Eight-Gaussians
+
+![Eight-Gaussians qualitative comparison](./report_assets/qualitative/eight_gaussians_sigma_0.50_dps_vs_fig_plus.png)
+
+## Quantitative Trends
+
+### Two-Moons
+
+![Two-Moons metric trends](./report_assets/two_moons_paper_metric_trends.png)
+
+### Eight-Gaussians
+
+![Eight-Gaussians metric trends](./report_assets/eight_gaussians_paper_metric_trends.png)
+
+## Denoising Dynamics
+
+The denoising animations are one of the most informative outputs of the project. They show how the conditional sample cloud evolves from the same noisy initialization under different samplers.
+
+### DPS vs FIG+
+
+![DPS vs FIG+ GIF](./animations/two_moons_sigma_0.05_dps_vs_fig_plus.gif)
+
+### DPS vs FIG vs FIG+
+
+![DPS vs FIG vs FIG+ GIF](./animations/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus.gif)
+
+The corresponding frame strips are also available:
+
+- [`two_moons_sigma_0.05_dps_vs_fig_plus_strip.png`](./animations/two_moons_sigma_0.05_dps_vs_fig_plus_strip.png)
+- [`two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png`](./animations/two_moons_sigma_0.05_dps_vs_fig_fixed_vs_fig_plus_strip.png)
+
+## File Structure
+
+- [`FIG_DPS_Toy2D_Paper.tex`](./FIG_DPS_Toy2D_Paper.tex): paper-style LaTeX report
+- [`build_paper.sh`](./build_paper.sh): build script for the LaTeX paper
+- [`report_assets/`](./report_assets): figures used in the paper
+- [`report_assets/qualitative/`](./report_assets/qualitative): qualitative DPS vs FIG+ comparison plots
+- [`animations/`](./animations): denoising GIFs and representative frame strips
+- [`corrected_best_summary.csv`](./corrected_best_summary.csv): compact summary of the best configurations
+- [`corrected_best_summary.md`](./corrected_best_summary.md): markdown version of the summary table
+
+## Build
+
+If a LaTeX engine is available on your machine, the paper can be compiled with:
 
 ```bash
-# clone project
-git clone https://github.com/riccizz/FIG.git
-cd FIG
-
-# build environment
-conda create -n fig python=3.10
-conda activate fig
-pip install -r requirements.txt
-
+cd toy_2d_outputs/paper_style
+bash build_paper.sh
 ```
 
-We use pretrained checkpoints from the following sources:
+If `latexmk` is installed, it will be used automatically. Otherwise the script falls back to `pdflatex`.
 
-- [RectifiedFlow](https://github.com/gnobitab/RectifiedFlow) for `FIG-flow`
-- [DAPS](https://github.com/zhangbingliang2019/DAPS) and [DDNM](https://github.com/wyhuai/DDNM) for `FIG-diffusion`
+## Summary
 
-
-## How to cite
-
-If you find this code useful in your research, please cite the following papers:
-
-```bibtex
-@inproceedings{
-    yan2025fig,
-    title={{FIG}: Flow with Interpolant Guidance for Linear Inverse Problems},
-    author={Yici Yan and Yichi Zhang and Xiangming Meng and Zhizhen Zhao},
-    booktitle={The Thirteenth International Conference on Learning Representations},
-    year={2025},
-    url={https://openreview.net/forum?id=fs2Z2z3GRx}
-}
-```
-
-
-## References
-
-This repo is developed based on [RectifiedFlow](https://github.com/gnobitab/RectifiedFlow) and [DAPS](https://github.com/zhangbingliang2019/DAPS). Please also consider citing them if you use this repo. 
-
-```bibtex
-@article{liu2022flow,
-    title={Flow straight and fast: Learning to generate and transfer data with rectified flow},
-    author={Liu, Xingchao and Gong, Chengyue and Liu, Qiang},
-    journal={arXiv preprint arXiv:2209.03003},
-    year={2022}
-}
-
-@misc{zhang2024improvingdiffusioninverseproblem,
-      title={Improving Diffusion Inverse Problem Solving with Decoupled Noise Annealing}, 
-      author={Bingliang Zhang and Wenda Chu and Julius Berner and Chenlin Meng and Anima Anandkumar and Yang Song},
-      year={2024},
-      eprint={2407.01521},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2407.01521}, 
-}
-```
+This project turns the original FIG repository into a small but interpretable benchmark for conditional diffusion on inverse problems. The resulting experiments show that low-dimensional toy settings are not just pedagogical: they reveal the geometry of posterior sampling directly and make the behavior of `DPS`, `FIG`, and `FIG+` much easier to understand than in image space alone.
