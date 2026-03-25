@@ -12,7 +12,7 @@ The FIG paper is available here: https://openreview.net/pdf?id=fs2Z2z3GRx
 
 Our full report is available here:
 
-- [`FIG_DPS_Toy2D_Paper.tex`](./toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex)
+- [`Report`](./Generative_models_for_images_report.pdf)
 
 ## What Is In This Study
 
