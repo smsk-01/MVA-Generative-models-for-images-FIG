@@ -8,6 +8,31 @@ The main goal is to make posterior geometry fully visible. Instead of working di
 - `FIG` (Flow with Interpolant Guidance)
 - `FIG+` (FIG with a Tweedie-based hidden-component mixing step)
 
+## Denoising Dynamics At A Glance
+
+The animation below is the most informative qualitative result of the project. It shows a fixed-line inpainting experiment on `Two-Moons` with observation line `x1 = 0`.
+
+![Two-Moons x1=0 GIF](./assets/readme/two_moons_sigma_0.05_x1_p0.00_vs_dps_vs_fig_plus.gif)
+
+How to read this GIF:
+
+- the sample cloud starts from a random Gaussian initialization
+- the **gray** points are the support of the true prior distribution (`Two-Moons`)
+- the **dashed vertical line** is the observation constraint `x1 = 0`
+- the **green** points are a reference approximation of the true posterior `p(x | y)`
+- the **blue** points are the current samples produced by `DPS`
+- the **red** points are the current samples produced by `FIG+`
+
+What the animation is meant to show:
+
+- we observe only `x1`, not `x2`
+- the solver must therefore reconstruct the plausible distribution of the hidden coordinate `x2`
+- since the prior is `Two-Moons`, the correct posterior is not “the whole line `x1 = 0`”
+- it is only the part of that line that intersects plausible regions of the prior
+- here, that posterior is bimodal, so a good solver must move the cloud toward the two correct modes on the line
+
+This is why the GIF is useful: it shows not only where the methods end, but how they reshape the cloud during denoising.
+
 The original FIG paper is available on OpenReview:
 
 - [Flow with Interpolant Guidance](https://openreview.net/pdf?id=fs2Z2z3GRx)
@@ -298,17 +323,15 @@ On `Eight-Gaussians`, the mode-preservation advantage of `FIG+` is even clearer.
 
 The most informative visual outputs are the denoising GIFs obtained from the same noisy initialization under a fixed observation line.
 
-In the final README we keep:
+This README highlights three representative cases:
 
 - `Two-Moons, x1 = 0`
 - `Two-Moons, x1 = 1`
 - `Eight-Gaussians, x1 = 0`
 
-The `Eight-Gaussians, x1 = 1` case exists in the paper assets but is intentionally omitted here to keep the README readable.
-
 ### Two-Moons, Fixed Line x1 = 0
 
-![Two-Moons x1=0 GIF](./assets/readme/two_moons_sigma_0.05_x1_p0.00_vs_dps_vs_fig_plus.gif)
+The top animation of this README corresponds to this case.
 
 Frame strip:
 
