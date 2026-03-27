@@ -70,6 +70,12 @@ def _solver_label(name: str) -> str:
     return labels.get(name, name)
 
 
+def _measurement_tag(value: float | None) -> str:
+    if value is None:
+        return "random_obs"
+    return f"x1_{value:+.2f}".replace("+", "p").replace("-", "m")
+
+
 def _save_frame_strip(
     trajectories: list[tuple[str, list[torch.Tensor], str]],
     background: np.ndarray,
@@ -210,7 +216,8 @@ def main():
         fig.suptitle(
             (
                 f"{args.dataset} | sigma_n={args.sigma_noise:.2f} | "
-                f"{_solver_label(args.fig_variant)}(K={args.fig_k}, w={args.fig_w:.1f})"
+                f"{_solver_label(args.fig_variant)}(K={args.fig_k}, w={args.fig_w:.1f}) | "
+                f"x1={float(y.item()):.2f}"
             ),
             fontsize=14,
         )
@@ -221,6 +228,7 @@ def main():
     stem_parts = [
         args.dataset,
         f"sigma_{args.sigma_noise:.2f}",
+        _measurement_tag(args.fixed_measurement),
         "dps",
         args.fig_variant,
     ]

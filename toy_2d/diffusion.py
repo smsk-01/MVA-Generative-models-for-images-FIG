@@ -85,10 +85,28 @@ class DiffusionSchedule:
         sqrt_one_minus = self.sqrt_one_minus_alpha_bars[t].unsqueeze(-1)
         return (x_t - sqrt_one_minus * eps_pred) / sqrt_alpha_bar.clamp_min(1e-8)
 
+    def ddpm_step(self, x_t: torch.Tensor, t: torch.Tensor, eps_pred: torch.Tensor) -> torch.Tensor:
+        x0_hat = self.predict_x0_from_eps(x_t, t, eps_pred)
+        t_prev = (t - 1).clamp_min(0)
+
+        alpha_t = self.alphas[t].unsqueeze(-1)
+        alpha_bar_t = self.alpha_bars[t].unsqueeze(-1)
+        alpha_bar_prev = self.alpha_bars[t_prev].unsqueeze(-1)
+        beta_t = self.betas[t].unsqueeze(-1)
+
+        denom = (1.0 - alpha_bar_t).clamp_min(1e-8)
+        coef_x0 = torch.sqrt(alpha_bar_prev) * beta_t / denom
+        coef_xt = torch.sqrt(alpha_t) * (1.0 - alpha_bar_prev) / denom
+        mean = coef_x0 * x0_hat + coef_xt * x_t
+
+        posterior_var = beta_t * (1.0 - alpha_bar_prev) / denom
+        noise = torch.randn_like(x_t)
+        nonzero_mask = (t > 1).float().unsqueeze(-1)
+        return mean + nonzero_mask * torch.sqrt(posterior_var.clamp_min(1e-8)) * noise
+
     def ddim_step(self, x_t: torch.Tensor, t: torch.Tensor, eps_pred: torch.Tensor) -> torch.Tensor:
         x0_hat = self.predict_x0_from_eps(x_t, t, eps_pred)
         t_prev = (t - 1).clamp_min(0)
         sqrt_alpha_bar_prev = self.sqrt_alpha_bars[t_prev].unsqueeze(-1)
         sqrt_one_minus_prev = self.sqrt_one_minus_alpha_bars[t_prev].unsqueeze(-1)
         return sqrt_alpha_bar_prev * x0_hat + sqrt_one_minus_prev * eps_pred
-

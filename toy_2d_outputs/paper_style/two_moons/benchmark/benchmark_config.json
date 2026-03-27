@@ -1,0 +1,20 @@
+{
+  "dataset": "two_moons",
+  "checkpoint": "toy_2d_outputs/paper_style/checkpoints/two_moons/ddpm_toy_2d.pt",
+  "output_dir": "toy_2d_outputs/paper_style",
+  "device": "mps",
+  "seed": 0,
+  "num_test_observations": 6,
+  "num_solver_samples": 128,
+  "num_reference_samples": 128,
+  "reference_pool_size": 20000,
+  "noise_levels": "0.05,0.5,1.0",
+  "fig_k_values": "1,3,5",
+  "fig_w_values": "0.0,0.5",
+  "fig_lr": 0.5,
+  "fig_variants": "fig_snr,fig_plus",
+  "fig_mix_coef": 0.95,
+  "dps_zeta": 0.05,
+  "plot_count": 2,
+  "observation_matrix": "1.0,0.0"
+}

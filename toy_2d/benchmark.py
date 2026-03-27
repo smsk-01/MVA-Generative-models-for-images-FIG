@@ -119,7 +119,8 @@ def load_model_from_checkpoint(checkpoint_path: str, device: torch.device):
         time_dim=model_config["time_dim"],
         num_layers=model_config["num_layers"],
     ).to(device)
-    model.load_state_dict(checkpoint["model_state_dict"])
+    state_dict = checkpoint.get("ema_state_dict", checkpoint["model_state_dict"])
+    model.load_state_dict(state_dict)
     model.eval()
 
     schedule = DiffusionSchedule(device=device, **schedule_config)

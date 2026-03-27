@@ -21,6 +21,28 @@ class SinusoidalTimeEmbedding(nn.Module):
         return torch.cat([torch.sin(args), torch.cos(args)], dim=-1)
 
 
+class ResidualTimeBlock(nn.Module):
+    def __init__(self, hidden_dim: int):
+        super().__init__()
+        self.norm = nn.LayerNorm(hidden_dim)
+        self.time_to_scale_shift = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(hidden_dim, 2 * hidden_dim),
+        )
+        self.net = nn.Sequential(
+            nn.Linear(hidden_dim, 4 * hidden_dim),
+            nn.SiLU(),
+            nn.Linear(4 * hidden_dim, hidden_dim),
+        )
+
+    def forward(self, x: torch.Tensor, time_features: torch.Tensor) -> torch.Tensor:
+        scale, shift = self.time_to_scale_shift(time_features).chunk(2, dim=-1)
+        h = self.norm(x)
+        h = h * (1.0 + scale) + shift
+        h = self.net(h)
+        return x + h
+
+
 class EpsilonMLP(nn.Module):
     def __init__(
         self,
@@ -32,23 +54,27 @@ class EpsilonMLP(nn.Module):
         super().__init__()
         self.time_embedding = SinusoidalTimeEmbedding(time_dim)
         self.time_mlp = nn.Sequential(
-            nn.Linear(time_dim, hidden_dim),
+            nn.Linear(time_dim, 4 * hidden_dim),
+            nn.SiLU(),
+            nn.Linear(4 * hidden_dim, hidden_dim),
+        )
+        self.input_proj = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
             nn.SiLU(),
             nn.Linear(hidden_dim, hidden_dim),
         )
-
-        layers = []
-        feature_dim = input_dim + hidden_dim
-        for _ in range(num_layers):
-            layers.append(nn.Linear(feature_dim, hidden_dim))
-            layers.append(nn.SiLU())
-            feature_dim = hidden_dim
-        layers.append(nn.Linear(hidden_dim, input_dim))
-        self.net = nn.Sequential(*layers)
+        self.blocks = nn.ModuleList([ResidualTimeBlock(hidden_dim) for _ in range(num_layers)])
+        self.output_head = nn.Sequential(
+            nn.LayerNorm(hidden_dim),
+            nn.SiLU(),
+            nn.Linear(hidden_dim, input_dim),
+        )
 
     def forward(self, x: torch.Tensor, t_normalized: torch.Tensor) -> torch.Tensor:
         time_features = self.time_embedding(t_normalized)
         time_features = self.time_mlp(time_features)
-        model_input = torch.cat([x, time_features], dim=-1)
-        return self.net(model_input)
 
+        hidden = self.input_proj(x)
+        for block in self.blocks:
+            hidden = block(hidden, time_features)
+        return self.output_head(hidden)

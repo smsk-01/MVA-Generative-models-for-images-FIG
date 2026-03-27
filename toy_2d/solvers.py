@@ -49,6 +49,33 @@ class UnconditionalDDIMSampler:
         return x
 
 
+class UnconditionalDDPMSampler:
+    def __init__(self, model, schedule):
+        self.model = model
+        self.schedule = schedule
+
+    @torch.no_grad()
+    def sample(
+        self,
+        num_samples: int,
+        device: torch.device | str,
+        initial_x: torch.Tensor | None = None,
+        return_trajectory: bool = False,
+    ) -> torch.Tensor | tuple[torch.Tensor, list[torch.Tensor]]:
+        device = torch.device(device)
+        x = initial_x.clone().to(device) if initial_x is not None else torch.randn(num_samples, 2, device=device)
+        trajectory = [x.detach().cpu()] if return_trajectory else None
+        for step in range(self.schedule.num_steps, 0, -1):
+            t = torch.full((num_samples,), step, device=device, dtype=torch.long)
+            eps_pred = self.model(x, self.schedule.normalize_timesteps(t))
+            x = self.schedule.ddpm_step(x, t, eps_pred)
+            if return_trajectory:
+                trajectory.append(x.detach().cpu())
+        if return_trajectory:
+            return x, trajectory
+        return x
+
+
 class DPSSolver:
     def __init__(self, model, schedule, observation_model, zeta: float = 0.05, grad_clip_norm: float = 10.0):
         self.model = model

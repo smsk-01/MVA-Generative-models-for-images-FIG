@@ -1,0 +1,15 @@
+{
+  "dataset": "eight_gaussians",
+  "output_dir": "toy_2d_outputs/paper_style/checkpoints",
+  "num_steps": 6000,
+  "batch_size": 1024,
+  "diffusion_steps": 128,
+  "schedule_type": "cosine",
+  "hidden_dim": 256,
+  "time_dim": 128,
+  "num_layers": 6,
+  "lr": 0.0003,
+  "ema_decay": 0.995,
+  "device": "mps",
+  "seed": 0
+}

@@ -24,6 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--time_dim", type=int, default=64)
     parser.add_argument("--num_layers", type=int, default=4)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--ema_decay", type=float, default=0.995)
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
@@ -53,6 +54,7 @@ def main():
         distribution=distribution,
         device=device,
         lr=args.lr,
+        ema_decay=args.ema_decay,
     )
     losses = trainer.train(
         num_steps=args.num_steps,
@@ -76,6 +78,7 @@ def main():
                 "num_steps": args.num_steps,
                 "batch_size": args.batch_size,
                 "lr": args.lr,
+                "ema_decay": args.ema_decay,
                 "seed": args.seed,
                 "device": args.device,
             },
@@ -89,4 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
