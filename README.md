@@ -37,14 +37,9 @@ The original FIG paper is available on OpenReview:
 
 - [Flow with Interpolant Guidance](https://openreview.net/pdf?id=fs2Z2z3GRx)
 
-The up-to-date paper-style report for this repository is:
+Our report is available here:
 
-- [`toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex`](./toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex)
-- [`toy_2d_outputs/paper_style/build_paper.sh`](./toy_2d_outputs/paper_style/build_paper.sh)
-
-The repository also contains a compiled PDF deliverable, but the LaTeX source above is the authoritative up-to-date version:
-
-- [`Generative_models_for_images_report.pdf`](./Generative_models_for_images_report.pdf)
+- [`report.pdf`](./report.pdf)
 
 ## Overview
 
@@ -93,7 +88,6 @@ The key code lives in:
 - [`toy_2d/solvers.py`](./toy_2d/solvers.py)
 - [`toy_2d/benchmark.py`](./toy_2d/benchmark.py)
 - [`toy_2d/make_denoising_gif.py`](./toy_2d/make_denoising_gif.py)
-- [`toy_2d/build_paper_assets.py`](./toy_2d/build_paper_assets.py)
 
 ## Problem Setup
 
@@ -298,8 +292,8 @@ This distinction is essential:
 
 The refreshed benchmark summaries are available here:
 
-- [`toy_2d_outputs/paper_style/corrected_best_summary.csv`](./toy_2d_outputs/paper_style/corrected_best_summary.csv)
-- [`toy_2d_outputs/paper_style/corrected_best_summary.md`](./toy_2d_outputs/paper_style/corrected_best_summary.md)
+- [`toy_2d_outputs/corrected_best_summary.csv`](./toy_2d_outputs/corrected_best_summary.csv)
+- [`toy_2d_outputs/corrected_best_summary.md`](./toy_2d_outputs/corrected_best_summary.md)
 
 Main quantitative takeaway:
 
@@ -377,7 +371,7 @@ Example for `Two-Moons`:
 ```bash
 python -m toy_2d.train \
   --dataset two_moons \
-  --output_dir toy_2d_outputs/paper_style/checkpoints \
+  --output_dir toy_2d_outputs/checkpoints \
   --num_steps 6000 \
   --batch_size 1024 \
   --diffusion_steps 128 \
@@ -395,8 +389,8 @@ python -m toy_2d.train \
 ```bash
 python -m toy_2d.benchmark \
   --dataset two_moons \
-  --checkpoint toy_2d_outputs/paper_style/checkpoints/two_moons/ddpm_toy_2d.pt \
-  --output_dir toy_2d_outputs/paper_style \
+  --checkpoint toy_2d_outputs/checkpoints/two_moons/ddpm_toy_2d.pt \
+  --output_dir toy_2d_outputs \
   --device mps \
   --num_test_observations 6 \
   --num_solver_samples 128 \
@@ -410,11 +404,6 @@ python -m toy_2d.benchmark \
   --dps_zeta 0.05
 ```
 
-### Build Paper Assets
-
-```bash
-python -m toy_2d.build_paper_assets --root_dir toy_2d_outputs/paper_style
-```
 
 ### Generate A Fixed-Line GIF
 
@@ -423,8 +412,8 @@ Example for `Two-Moons, x1 = 0`:
 ```bash
 python -m toy_2d.make_denoising_gif \
   --dataset two_moons \
-  --checkpoint toy_2d_outputs/paper_style/checkpoints/two_moons/ddpm_toy_2d.pt \
-  --output_dir toy_2d_outputs/paper_style/animations \
+  --checkpoint toy_2d_outputs/checkpoints/two_moons/ddpm_toy_2d.pt \
+  --output_dir toy_2d_outputs/animations \
   --sigma_noise 0.05 \
   --fixed_measurement 0.0 \
   --fig_variant fig_plus \
@@ -438,23 +427,3 @@ python -m toy_2d.make_denoising_gif \
   --reference_pool_size 50000 \
   --device mps
 ```
-
-### Compile The LaTeX Paper
-
-```bash
-cd toy_2d_outputs/paper_style
-bash build_paper.sh
-```
-
-## Final Notes
-
-- The LaTeX source is the most up-to-date written report.
-- The benchmarks and plots in `toy_2d_outputs/paper_style` have been refreshed with the improved priors.
-- The README intentionally focuses on the most informative visuals and omits the `Eight-Gaussians, x1 = 1` animation to stay readable.
-
-If you want the full story, the best reading order is:
-
-1. this `README`
-2. [`toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex`](./toy_2d_outputs/paper_style/FIG_DPS_Toy2D_Paper.tex)
-3. the GIFs in [`toy_2d_outputs/paper_style/animations`](./toy_2d_outputs/paper_style/animations)
-4. the code in [`toy_2d`](./toy_2d)
